@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tarjeta Digital - Slides</title>
+  <style>
+    :root{
+      --mint:#35b79a;
+      --txt:#1c2a33;
+      --muted:#6b7c8a;
+      --card:#ffffff;
+      --bg:#dfe5ea;
+      --shadow:0 18px 50px rgba(0,0,0,.16);
+      --radius:18px;
+
+      /* altura del footer fijo */
+      --footerH:64px;
+
+      /* alto de la sección visible (pantalla menos footer) */
+      --vh: calc(100vh - var(--footerH));
+      --maxW: 1100px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--txt);
+      background: var(--bg);
+      overflow-x:hidden;
+    }
+
+    /* ===== Fondo fijo (foto atrás) ===== */
+    .bg-fixed{
+      position:fixed;
+      inset:0;
+      background:
+        linear-gradient(90deg, rgba(53,183,154,.65), rgba(53,183,154,.25)),
+        url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=60");
+      background-size: cover;
+      background-position:center;
+      background-attachment: fixed;
+      z-index:-2;
+    }
+    /* capa para que se parezca al ejemplo (gris + centro blanco) */
+    .bg-mask{
+      position:fixed;
+      inset:0;
+      background: rgba(220,224,228,.80);
+      z-index:-1;
+    }
+
+    /* ===== Contenedor que “avanza” por pantallas ===== */
+    .deck{
+      height: var(--vh);
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior:smooth;
+      padding-bottom: 14px;
+    }
+
+    /* cada sección ocupa la pantalla completa (menos footer) */
+    .slide{
+      height: var(--vh);
+      scroll-snap-align: start;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+
+    /* “tarjeta” centrada */
+    .card{
+      width: min(var(--maxW), 100%);
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.10);
+      overflow:hidden;
+    }
+
+    /* Layout común interno */
+    .inner{
+      padding: 22px 24px;
+    }
+
+    /* ===== Animación: entra de lado y termina centrado ===== */
+    .card{
+      opacity:0;
+      transform: translateX(0);
+      transition: transform .55s ease, opacity .55s ease;
+      will-change: transform, opacity;
+    }
+    .slide[data-from="left"] .card{ transform: translateX(-14vw); }
+    .slide[data-from="right"] .card{ transform: translateX( 14vw); }
+
+    .slide.inview .card{
+      opacity:1;
+      transform: translateX(0);
+    }
+
+    /* ===== Titulares estilo tu referencia ===== */
+    .title{
+      margin:0;
+      font-size: 56px;
+      letter-spacing: 12px;
+      text-transform: uppercase;
+      color:#3d3d3d;
+    }
+    .rule{
+      height: 3px;
+      width: 100%;
+      background: rgba(53,183,154,.85);
+      margin: 14px 0 0;
+    }
+    .sub{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    /* ===== Slide 1: Header como el ejemplo ===== */
+   
+.hero{
+  display:grid;
+  grid-template-columns: 1.05fr 1fr;
+  min-height: 340px;   /* ya lo tienes en tu ejemplo; déjalo */
+}
+
+/* FOTO: define alto y evita que crezca raro */
+.hero .photo{
+  background:#e8eef3;   /* o #fff */
+  overflow:hidden;
+  border-right: 1px solid rgba(0,0,0,.08);
+  height: 340px;        /* tu alto */
+}
+
+.hero .photo img{
+  width:100%;
+  height:100%;
+  object-fit: contain;  /* ✅ NO recorta */
+  object-position: center;
+  display:block;
+}
+
+    .hero .info{
+      padding: 28px 26px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap: 10px;
+    }
+    .name{
+      margin:0;
+      font-size: 44px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color:#2e2e2e;
+    }
+    .brand{
+      margin:0;
+      font-size: 30px;
+      text-transform: uppercase;
+      color:#2e2e2e;
+      letter-spacing: 1px;
+    }
+    .role{
+      margin: 2px 0 0;
+      font-size: 18px;
+      color:#2e2e2e;
+    }
+    .hero .line{
+      height:3px;
+      width: 70%;
+      background: rgba(53,183,154,.85);
+      margin: 10px 0 10px;
+    }
+    .contacts{
+      display:grid;
+      gap:10px;
+      margin-top: 8px;
+    }
+    .c{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color:#54606a;
+      font-size: 18px;
+    }
+    .dot{
+      width: 36px; height: 36px;
+      border-radius: 999px;
+      display:grid; place-items:center;
+      background: rgba(53,183,154,.15);
+      border: 1px solid rgba(53,183,154,.35);
+      flex: 0 0 auto;
+    }
+
+    /* ===== Slide 2: Sobre mí (texto + ilustración) ===== */
+    .twoCols{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      align-items:center;
+      padding: 22px 24px 26px;
+    }
+  .illu{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#lottieMarketing{
+  width: min(420px, 100%);
+  aspect-ratio: 4 / 3;
+}
+
+    /* ===== Slide 3: Portafolio (grid) ===== */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 18px 24px 26px;
+    }
+    .thumb{
+      border-radius: 10px;
+      overflow:hidden;
+      border: 1px solid rgba(0,0,0,.12);
+      background:#e8eef3;
+      cursor:pointer;
+    }
+    .thumb img{
+      width:100%;
+      height: 170px;
+      object-fit: cover;
+      display:block;
+      transition: transform .18s ease;
+    }
+    .thumb:hover img{ transform: scale(1.03); }
+    /* ===== Lightbox (abrir imagen) ===== */
+.lightbox{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.70);
+  display: none;                 /* cerrado */
+  place-items: center;
+  z-index: 9999;
+  padding: 22px;
+}
+
+.lightbox.open{ display: grid; } /* abierto */
+
+.lb-img{
+  max-width: min(1000px, 96vw);
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 22px 60px rgba(0,0,0,.45);
+  background: #fff;
+}
+
+.lb-close{
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* =========================
+   FIX RESPONSIVE (MÓVIL)
+   evita que se encimen slides
+   ========================= */
+@media (max-width: 900px){
+
+  /* 1) SOBRE MI: de 2 columnas a 1 */
+  .twoCols{
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Ilustración abajo (o arriba si quieres) */
+  .illu{
+    order: 2;
+  }
+
+  /* 2) PORTAFOLIO: reduce columnas */
+  .grid{
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 14px 16px 20px;
+  }
+
+  .thumb img{
+    height: 130px;
+  }
+
+  /* 3) IMPORTANTÍSIMO:
+     En móvil el contenido debe poder crecer (sin aplastar)
+     Esto evita que el siguiente slide se meta encima */
+  .slide,
+  .card{
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+}
+
+/* Extra pequeño */
+@media (max-width: 520px){
+  .grid{ grid-template-columns: 1fr; }
+  .thumb img{ height: 180px; }
+}
+
+    /* ===== Slide 4: Ubicación (mapa) ===== */
+    .map{
+      padding: 18px 24px 26px;
+    }
+    .map iframe{
+      width:100%;
+      height: 420px;
+      border:0;
+      display:block;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,.12);
+    }
+
+    /* ===== Slide 5: QR + VCARD ===== */
+    .qrwrap{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      padding: 18px 24px 26px;
+      text-align:center;
+    }
+    .qbox{
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: #fff;
+    }
+    .qtitle{
+      margin:0;
+      font-size: 26px;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color:#3d3d3d;
+    }
+    .qsub{
+      margin: 6px 0 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .qline{
+      height:3px;
+      width: 80%;
+      background: rgba(53,183,154,.85);
+      margin: 12px auto 18px;
+    }
+    .qbox img{
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      display:block;
+      margin: 0 auto 12px;
+    }
+    .small{
+      margin:0;
+      color:#58636c;
+      font-size: 16px;
+      line-height:1.6;
+    }
+
+    /* ===== Footer fijo ===== */
+    .footer{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      height: var(--footerH);
+      background:#0b0f12;
+      color:#e9edf2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      padding: 0 14px;
+      z-index: 10;
+      text-align:center;
+      font-size: 14px;
+    }
+    .footer a{ color: #35b79a; text-decoration: underline; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 980px){
+      .title{ font-size: 44px; letter-spacing: 10px; }
+      .name{ font-size: 38px; }
+      .brand{ font-size: 26px; }
+      .hero{ grid-template-columns: 1fr; }
+      .hero .photo{ border-right:0; border-bottom: 1px solid rgba(0,0,0,.08); }
+      .twoCols{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+      .map iframe{ height: 360px; }
+      .qrwrap{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px){
+      .title{ font-size: 34px; letter-spacing: 8px; }
+      .grid{ grid-template-columns: 1fr; }
+      .thumb img{ height: 190px; }
+    }
+
+    /* Accesibilidad: si el usuario prefiere menos animación */
+    @media (prefers-reduced-motion: reduce){
+      .deck{ scroll-behavior:auto; }
+      .card{ transition:none; }
+      .slide[data-from="left"] .card,
+      .slide[data-from="right"] .card{ transform:none; }
+      .slide.inview .card{ opacity:1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-fixed" aria-hidden="true"></div>
+  <div class="bg-mask" aria-hidden="true"></div>
+
+  <main class="deck" id="deck">
+    <!-- 1: entra desde IZQUIERDA -->
+    <section class="slide" data-from="left">
+      <div class="card">
+        <div class="hero">
+          <div class="photo">
+            <img src="Foto.jpg" alt="Foto" />
+          </div>
+          <div class="info">
+            <h2 class="name">JUAN MANUEL</h2>
+            <h3 class="brand">AGENCIA MINT</h3>
+            <p class="role">Marketing Digital y Diseño web</p>
+            <div class="line"></div>
+
+            <div class="contacts">
+              <div class="c"><span class="dot">@</span> whoanmanuel@gmail.com</div>
+              <div class="c"><span class="dot">☎</span> 55 3644 2337</div>
+              <div class="c"><span class="dot">↗</span> whoanma.com</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2: entra desde DERECHA -->
+    <section class="slide" data-from="right">
+      <div class="card">
+        <div class="inner">
+          <h1 class="title">SOBRE MI</h1>
+          <div class="rule"></div>
+        </div>
+
+        <div class="twoCols">
+          <div>
+            <p class="sub">
+              Apasionado de la tecnología, nuevas tendencias y las ideas disruptivas. Con más de 10 años
+              de experiencia en la creación de sitios web, estrategias digitales, tiendas online, blogs,
+              sistemas de ventas, posicionamiento y analítica web.
+            </p>
+            <p class="sub">
+              Creativo, capaz de imaginar, administrar, desarrollar y medir proyectos digitales
+              a través de sus herramientas y enseñar a las personas tanto a empresas a cómo
+              usar el internet a su favor.
+            </p>
+          </div>
+
+ <div class="illu">
+  <div id="lottieMarketing"></div>
+</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3: entra desde IZQUIERDA -->
+    <section class="slide" data-from="left">
+      <div class="card">
+        <div class="inner">
+          <h1 class="title">PORTAFOLIO</h1>
+          <div class="rule"></div>
+        </div>
+
+        <div class="grid">
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=1200&q=60" alt="Proyecto 1"></div>
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=60" alt="Proyecto 2"></div>
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=60" alt="Proyecto 3"></div>
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1523958203904-cdcb402031fd?auto=format&fit=crop&w=1200&q=60" alt="Proyecto 4"></div>
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1522071901873-411886a10004?auto=format&fit=crop&w=1200&q=60" alt="Proyecto 5"></div>
+          <div class="thumb"><img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=60" alt="Proyecto 6"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4: entra desde DERECHA -->
+    <section class="slide" data-from="right">
+      <div class="card">
+        <div class="inner">
+          <h1 class="title">UBICACIÓN</h1>
+          <div class="rule"></div>
+        </div>
+
+        <div class="map">
+          <!-- Reemplaza el src por TU embed real -->
+          <iframe
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.6792899674727!2d-99.1628!3d19.4270!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ff35e8e2d0a9%3A0x0!2sCDMX!5e0!3m2!1ses!2smx!4v0">
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5: entra desde IZQUIERDA -->
+    <section class="slide" data-from="left">
+      <div class="card">
+        <div class="qrwrap">
+          <div class="qbox">
+            <h3 class="qtitle">CÓDIGO QR</h3>
+            <div class="qsub">para compartir tarjeta</div>
+            <div class="qline"></div>
+
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https%3A%2F%2Ftuweb.com" alt="QR Tarjeta">
+            <p class="small">Comparte o escanea este código con tu celular para acceder a la tarjeta de presentación.</p>
+          </div>
+
+         <div class="qbox">
+            <h3 class="qtitle">CÓDIGO QR</h3>
+            <div class="qsub">Enviar mensaje</div>
+            <div class="qline"></div>
+
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https%3A%2F%2Ftuweb.com" alt="QR Tarjeta">
+            <p class="small">Comparte o escanea este código con tu celular para recibir mensajes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+<!-- LIGHTBOX (una sola vez, fuera de todo) -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lb-close" id="lbClose" aria-label="Cerrar">✕</button>
+  <img class="lb-img" id="lbImg" alt="Vista previa" />
+</div>
+
+  <!-- Footer fijo -->
+  <footer class="footer">
+    Tarjeta de presentación creada por <a href="#" target="_blank" rel="noreferrer">creaciones19.mx</a>
+    <span style="opacity:.7">© 2020–2026</span>
+  </footer>
+
+  <script>
+    // Marca cada slide como "inview" cuando entra (para la animación izquierda/derecha)
+    const slides = document.querySelectorAll(".slide");
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if(e.isIntersecting) e.target.classList.add("inview");
+      });
+    }, { root: document.getElementById("deck"), threshold: 0.35 });
+
+    slides.forEach(s => io.observe(s));
+
+    // Opcional: asegurar que la primera aparezca animada al cargar
+    window.addEventListener("load", () => {
+      slides[0].classList.add("inview");
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<script>
+  lottie.loadAnimation({
+    container: document.getElementById('lottieMarketing'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'imagenmar.json' // 👈 está bien, está en la raíz
+  });
+</script>
+<script>
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbClose = document.getElementById('lbClose');
+
+  // ✅ Tu estructura real: .thumb img
+  document.querySelectorAll('.thumb img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden', 'false');
+    });
+  });
+
+  function closeLB(){
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden', 'true');
+    lbImg.src = '';
+  }
+
+  lbClose.addEventListener('click', closeLB);
+  lb.addEventListener('click', (e) => { if(e.target === lb) closeLB(); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeLB(); });
+</script>
+
+
+</body>
+</html>
